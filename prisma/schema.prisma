@@ -26,4 +26,21 @@ model User {
   role      Role     @default(CUSTOMER)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  events Event[]
+}
+
+model Event {
+  id          Int      @id @default(autoincrement())
+  tittle      String
+  description String?
+  location    String
+  startDate   DateTime 
+  endDate     DateTime
+  organizerId Int
+
+  organizer User @relation(fields : [organizerId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
