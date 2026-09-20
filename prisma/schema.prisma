@@ -28,6 +28,7 @@ model User {
   updatedAt DateTime @updatedAt
 
   events Event[]
+  orders Order[]
 }
 
 model Event {
@@ -54,9 +55,27 @@ model Ticket {
   eventId Int
 
   event Event @relation(fields : [eventId], references: [id])
-  
+
   createdAt DateTime  @default(now())
   updatedAt DateTime @updatedAt
 
 }
 
+enum orderStatus {
+  PENDING 
+  PAID
+  CANCELLED
+  EXPIRED
+}
+
+model Order {
+  id      Int         @id @default(autoincrement())
+  userId  Int
+  total   Int
+  status  orderStatus @default(PENDING)
+
+  user User @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
