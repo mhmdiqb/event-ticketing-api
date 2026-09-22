@@ -1,8 +1,11 @@
 const prisma = require("../lib/prisma");
 const bcrypt = require("bcrypt")
 
+
 const { hashPassword } = require("../utils/password");
 const { is } = require("express/lib/request");
+const { generateToken } = require("../utils/token");
+
 
 const registerUser = async (req, res) => {
     const { name, email, password } = req.body;
@@ -47,6 +50,7 @@ const registerUser = async (req, res) => {
 };
 
 const loginUser = async (req, res) => {
+
     const { email, password } = req.body   
 
     if (!email || !password) {
@@ -68,6 +72,7 @@ const loginUser = async (req, res) => {
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password)
+    const token = generateToken(user)
 
     if (!isPasswordValid) {
         return res.status(401).json({
@@ -82,7 +87,8 @@ const loginUser = async (req, res) => {
             name: user.name,
             email: user.email,
             role: user.role
-        }
+        },
+        token
     })
 }
 
