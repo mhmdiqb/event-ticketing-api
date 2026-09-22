@@ -1,6 +1,8 @@
 const prisma = require("../lib/prisma");
+const bcrypt = require("bcrypt")
 
 const { hashPassword } = require("../utils/password");
+const { is } = require("express/lib/request");
 
 const registerUser = async (req, res) => {
     const { name, email, password } = req.body;
@@ -44,6 +46,48 @@ const registerUser = async (req, res) => {
     });
 };
 
+const loginUser = async (req, res) => {
+    const { email, password } = req.body   
+
+    if (!email || !password) {
+        return res.status(400).json({
+            message: "email and password are required"
+        })
+    }
+
+    const user = await prisma.user.findUnique({
+        where: {
+            email
+        }
+    })
+
+    if (!user) {
+        return res.status(401).json({
+            message: "invalid email or password"
+        })
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, user.password)
+
+    if (!isPasswordValid) {
+        return res.status(401).json({
+            message: "email and password invalid"
+        })
+    }
+
+    res.json({
+        message: "Login successful",
+        data: {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            role: user.role
+        }
+    })
+}
+
 module.exports = {
-    registerUser
+    registerUser,
+    loginUser
 };
+
