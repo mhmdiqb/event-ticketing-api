@@ -112,9 +112,36 @@ const updateEvent = async (req, res) => {
     })
 }
 
+const deleteEvent = async (req, res) => {
+    const { id } = req.params
+
+    const existingEvent = await prisma.event.findUnique({
+        where: {
+            id: Number(id)
+        }
+    })
+
+    if (!existingEvent) {
+        return  res.status(403).json({
+            message: "Event not found"
+        })
+    }
+
+    await prisma.event.delete({
+        where: {
+            id: Number(id)
+        }
+    })
+
+    res.status(200).json({
+        message: "Event delete successfully"
+    })
+}
+
 module.exports = {
     createEvent,
     getEvents,
     getEventById,
-    updateEvent
+    updateEvent,
+    deleteEvent
 }
