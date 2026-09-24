@@ -99,9 +99,17 @@ const getMe = async (req, res) => {
     })
 }
 
+const adminTest = async (req, res) => {
+    res.json({
+        message: "admin access granted",
+        user: req.user
+    })
+}
+
 module.exports = {
     registerUser,
     loginUser,
-    getMe
+    getMe,
+    adminTest
 };
 
