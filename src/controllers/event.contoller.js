@@ -47,7 +47,27 @@ const getEvents = async (req, res) => {
     })
 }
 
+const getEventById = async (req, res) => {
+    const {id} = req.params
+    const event = await prisma.event.findUnique({
+        where: {
+            id: Number(id)
+        }
+    })
+
+    if (!event) {
+        return res.status(404).json({
+            message: "Event not found"
+        })
+    }
+    res.status(200).json({
+        message: "Event retrieved successfully",
+        data: event
+    })
+}
+
 module.exports = {
     createEvent,
-    getEvents
+    getEvents,
+    getEventById
 }
