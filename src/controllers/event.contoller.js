@@ -1,4 +1,4 @@
-const prisma = require("../lib/prisma");
+const prisma = require("../lib/prisma")
 
 const createEvent = async (req, res) => {
 
@@ -13,7 +13,7 @@ const createEvent = async (req, res) => {
     if (!title || !location || !startDate || !endDate) {
         return res.status(400).json({
             message: "Title, location, startDate, and endDate are required"
-        });
+        })
     }
 
     const event = await prisma.event.create({
@@ -25,14 +25,29 @@ const createEvent = async (req, res) => {
             endDate: new Date(endDate),
             organizerId: req.user.id
         }
-    });
+    })
 
     res.status(201).json({
         message: "Event created successfully",
         data: event
-    });
-};
+    })
+}
+
+const getEvents = async (req, res) => {
+
+    const events = await prisma.event.findMany({
+        orderBy: {
+            startDate: "asc"
+        }
+    })
+
+    res.status(200).json({
+        message: "Events retrieved successfully",
+        data: events
+    })
+}
 
 module.exports = {
-    createEvent
-};
+    createEvent,
+    getEvents
+}
