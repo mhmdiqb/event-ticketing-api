@@ -1,3 +1,4 @@
+const e = require("express");
 const prisma = require("../lib/prisma")
 
 const createEvent = async (req, res) => {
@@ -66,8 +67,54 @@ const getEventById = async (req, res) => {
     })
 }
 
+const updateEvent = async (req, res) => {
+    const { id } = req.params
+    
+    const {
+        title,
+        description,
+        location,
+        startDate,
+        endDate
+    } = req.body
+
+    const existingEvent = await prisma.event.findUnique({
+        where: {
+            id: Number(id)
+        }
+    })
+
+    if (!existingEvent) {
+        return res.status(404).json({
+            message: "event not found"
+        })
+    }
+
+    const event = await prisma.event.update({
+        where: {
+            id: Number(id)
+        },
+        data: {
+            title,
+            description,
+            location,
+            startDate: startDate
+                ? new Date(startDate)
+                :existingEvent.startDate,
+            endDate: endDate
+                ? new Date(endDate)
+                :existingEvent.endDate
+        }
+    })
+    res.status(200).json({
+        message: "event update succesfully",
+        data: event
+    })
+}
+
 module.exports = {
     createEvent,
     getEvents,
-    getEventById
+    getEventById,
+    updateEvent
 }
