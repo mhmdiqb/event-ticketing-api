@@ -35,7 +35,36 @@ const createTicket = async (req, res) => {
         data: ticket
     })
 }
+const getTicketByEvent = async (req, res) => {
+    const { eventId } = req.params
+
+    const event = await prisma.event.findUnique({
+        where: {
+            id: Number(eventId)
+        }
+    })
+
+    if (!event) {
+        return res.status(404).json({
+            message: "Event not found"
+        })
+    }
+
+    const tickets = await prisma.ticket.findMany({
+        where: {
+            id: Number(eventId)
+        },
+        orderBy: {
+            price: "asc"
+        }
+    })
+    res.status(200).json({
+        message: "Tickets retrieved successfully",
+        data: tickets
+    })
+}
 
 module.exports = {
-    createTicket
+    createTicket,
+    getTicketByEvent
 }

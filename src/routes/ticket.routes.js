@@ -1,6 +1,6 @@
 const express = require("express")
 
-const { createTicket } = require("../controllers/ticket.controller")
+const { createTicket, getTicketByEvent } = require("../controllers/ticket.controller")
 const { authenticate, authorize } = require("../middlewares/auth.middleware")
 
 const router = express.Router()
@@ -10,6 +10,11 @@ router.post(
     authenticate,
     authorize("ADMIN", "ORGANIZER"),
     createTicket
+)
+
+router.get(
+    "/events/:eventId/tickets",
+    getTicketByEvent
 )
 
 module.exports = router
