@@ -64,7 +64,68 @@ const getTicketByEvent = async (req, res) => {
     })
 }
 
+const getTicketById = async (req, res) => {
+    const { id } = req.params
+
+    const ticket = await prisma.ticket.findUnique({
+        where: {
+            id: Number(id)
+        },
+        include: {
+            event: true
+        }
+    })
+    if (!ticket) {
+        return res.status(404).json({
+            message: "Ticket not found"
+        })
+    }
+    res.status(200).json({
+        message: "Ticket retrieved successfully",
+        data: ticket
+    })
+}
+
+const updateTicket = async (req, res) => {
+    const { id } = req.params
+    const { name, price, stock } = req.body
+
+    const existingTicket = await prisma.ticket.findUnique({
+        where: {
+            id: Number(id)
+        }
+    })
+    
+    if (!existingTicket) {
+        return res.status(404).json({
+            message: "Ticket not found"
+        })
+    }
+
+    const ticket = await prisma.ticket.update({
+        where: {
+            id: Number(id)
+        },
+        data: {
+            name: name ?? existingTicket.name,
+            price: price !== undefined
+                ? Number(price)
+                : existingTicket.price,
+            stock: stock !== undefined
+                ? Number(stock)
+                : existingTicket.stock
+        }
+    })
+    res.status(200).json({
+        message: "Ticket update Successfully",
+        data: ticket
+    })
+}
+
 module.exports = {
     createTicket,
-    getTicketByEvent
+    getTicketByEvent,
+    getTicketById,
+    updateTicket
 }
+

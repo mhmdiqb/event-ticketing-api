@@ -1,7 +1,8 @@
 const express = require("express")
 
-const { createTicket, getTicketByEvent } = require("../controllers/ticket.controller")
+const { createTicket, getTicketByEvent, getTicketById, updateTicket } = require("../controllers/ticket.controller")
 const { authenticate, authorize } = require("../middlewares/auth.middleware")
+const { get } = require("./auth.routes")
 
 const router = express.Router()
 
@@ -15,6 +16,18 @@ router.post(
 router.get(
     "/events/:eventId/tickets",
     getTicketByEvent
+)
+
+router.get(
+    "/tickets/:id",
+    getTicketById   
+)
+
+router.put(
+    "/tickets/:id",
+    authenticate,
+    authorize("ADMIN", "ORGANIZER"),
+    updateTicket
 )
 
 module.exports = router
