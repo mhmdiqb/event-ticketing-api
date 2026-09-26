@@ -143,8 +143,47 @@ const payOrder = async(req, res) => {
     }
 }
 
+const getOderById = async (req, res) => {
+    const orderId = Number(req.params.id)
+
+    try {
+        const order = await prisma.order.findUnique({
+            where: {
+                id: orderId
+            },
+            include: {
+                items: {
+                    include: {
+                        ticket: true
+                    }
+                }
+            }
+        })
+        if (!order) {
+            return res.status(404).json({
+                message: "Order not found"
+            })
+        }
+        if (order.userId !== req.user.id) {
+            return res.status(403).json({
+                message: "yo do not have permission to view this order"
+            })
+        }
+        res.status(200).json({
+            message: "Order retrieved successfully"
+        })
+    } catch (error) {
+        console.error(error)
+
+        res.status(500).json({
+            message: "Failed to retrieve order"
+        })
+    }
+}
+
 module.exports = {
     createOrder,
     getOrders,
-    payOrder
+    payOrder,
+    getOderById
 }
