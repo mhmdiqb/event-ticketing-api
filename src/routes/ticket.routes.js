@@ -1,6 +1,6 @@
 const express = require("express")
 
-const { createTicket, getTicketByEvent, getTicketById, updateTicket } = require("../controllers/ticket.controller")
+const { createTicket, getTicketByEvent, getTicketById, updateTicket, deleteTicket } = require("../controllers/ticket.controller")
 const { authenticate, authorize } = require("../middlewares/auth.middleware")
 const { get } = require("./auth.routes")
 
@@ -29,5 +29,13 @@ router.put(
     authorize("ADMIN", "ORGANIZER"),
     updateTicket
 )
+
+router.delete(
+    "/tickets/:id",
+    authenticate,
+    authorize("ADMIN", "ORGANIZER"),
+    deleteTicket
+)
+
 
 module.exports = router
