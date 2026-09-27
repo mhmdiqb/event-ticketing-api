@@ -1,8 +1,9 @@
 const express = require("express")
 
+const { validate } = require("../middlewares/validation.middleware")
 const { createTicket, getTicketByEvent, getTicketById, updateTicket, deleteTicket } = require("../controllers/ticket.controller")
 const { authenticate, authorize } = require("../middlewares/auth.middleware")
-const { get } = require("./auth.routes")
+const { createTicketSchema, updateTicketSchema } = require("../validations/ticket.validation")
 
 const router = express.Router()
 
@@ -10,6 +11,7 @@ router.post(
     "/events/:eventId/tickets",
     authenticate,
     authorize("ADMIN", "ORGANIZER"),
+    validate(createTicketSchema),
     createTicket
 )
 
@@ -27,6 +29,7 @@ router.put(
     "/tickets/:id",
     authenticate,
     authorize("ADMIN", "ORGANIZER"),
+    validate(updateTicketSchema),
     updateTicket
 )
 
