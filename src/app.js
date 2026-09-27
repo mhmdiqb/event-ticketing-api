@@ -1,14 +1,29 @@
 const exppress = require('express')
-const { log } = require('node:console')
+const helmet = require("helmet")
+const cors = require("cors")
+const rateLimit = require("express-rate-limit")
+
 const authRoutes = require("./routes/auth.routes")
 const eventRoutes = require("./routes/event.routes")
 const ticketRoutes = require("./routes/ticket.routes")
 const orderRoutes = require("./routes/order.routes")
 const { expirePendingOrders } = require("./services/order-expiry.service")
+const { _max } = require('zod/v4/core')
 
 const app = exppress()
 
+app.use(helmet())
+app.use(cors())
 app.use(exppress.json())
+const apiLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 100,
+    message: {
+        message: "Too many request, please try again later"
+    }
+})
+app.use("/api", apiLimiter)
+
 app.use("/api/auth", authRoutes)
 app.use("/api/events", eventRoutes)
 app.use("/api",ticketRoutes)
