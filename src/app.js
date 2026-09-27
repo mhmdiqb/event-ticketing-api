@@ -4,6 +4,7 @@ const authRoutes = require("./routes/auth.routes")
 const eventRoutes = require("./routes/event.routes")
 const ticketRoutes = require("./routes/ticket.routes")
 const orderRoutes = require("./routes/order.routes")
+const { expirePendingOrders } = require("./services/order-expiry.service")
 
 const app = exppress()
 
@@ -12,6 +13,10 @@ app.use("/api/auth", authRoutes)
 app.use("/api/events", eventRoutes)
 app.use("/api",ticketRoutes)
 app.use("/api/orders", orderRoutes)
+
+setInterval(() => {
+    expirePendingOrders()
+}, 60 * 1000)
 
 app.get("/", (req, res) => {
     res.json({
