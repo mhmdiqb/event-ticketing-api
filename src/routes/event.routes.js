@@ -3,7 +3,8 @@ const express = require("express")
 const { createEvent, getEvents, getEventById, updateEvent, deleteEvent} = require("../controllers/event.contoller")
 
 const { authenticate, authorize } = require("../middlewares/auth.middleware")
-const { post } = require("./auth.routes")
+const { validate } = require("../middlewares/validation.middleware")
+const { createEventSchema } = require("../validations/event.validation")
 
 const router = express.Router()
 
@@ -14,6 +15,7 @@ router.put(
     "/:id",
     authenticate,
     authorize("ADMIN", "ORGANIZER"),
+    validate(createEventSchema),
     updateEvent
 );
 
@@ -21,6 +23,7 @@ router.post(
     "/",
     authenticate,
     authorize("ADMIN", "ORGANIZER"),
+    validate(createEventSchema),
     createEvent
 )
 

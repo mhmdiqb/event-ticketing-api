@@ -244,10 +244,69 @@ const cancelOrder = async(req, res) => {
     }
 }
 
+const expireOrder = async (req, res) => {
+    const orderId = Number(req.params.id) 
+
+    try {
+        const order = await prisma.order.findUnique({
+            where: {
+                id: orderId
+            },
+            include: {
+                items: true
+            }
+        })
+        if (!order) {
+            return res.status(404).json({
+                message: "Order not found"
+            })
+        }
+        if (order.status !== "PENDING") {
+            return res.status(400).json({
+                message: "Only pending orders can be expired"
+            })
+        }
+        const expiredOrder = await prisma.$transaction(async(tx) => {
+            for (const item of order.items) {
+                await tx.ticket.update({
+                    where: {
+                        id: item.ticketId
+                    },
+                    data: {
+                        stock: {
+                            increment: item.quantity
+                        }
+                    }
+                })
+            }
+            const updateOrder = await tx.order.update({
+                where: {
+                    id: orderId
+                },
+                data: {
+                    status: "EXPIRED"
+                }
+            })
+            return updateOrder
+        })
+        res.status(200).json({
+            message: "Order expired successfully",
+            data: expiredOrder
+        })
+    } catch (error) {
+        console.error(error)
+        
+        res.status(500).json({
+            message: "Failed to expire order"
+        })
+    }
+}
+
 module.exports = {
     createOrder,
     getOrders,
     payOrder,
     getOderById,
-    cancelOrder
+    cancelOrder,
+    expireOrder
 }
