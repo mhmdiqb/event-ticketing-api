@@ -2,13 +2,14 @@ const exppress = require('express')
 const helmet = require("helmet")
 const cors = require("cors")
 const rateLimit = require("express-rate-limit")
+const swaggerUI = require("swagger-ui-express")
+const swaggerSpec = require("./config/swagger")
 
 const authRoutes = require("./routes/auth.routes")
 const eventRoutes = require("./routes/event.routes")
 const ticketRoutes = require("./routes/ticket.routes")
 const orderRoutes = require("./routes/order.routes")
 const { expirePendingOrders } = require("./services/order-expiry.service")
-const { _max } = require('zod/v4/core')
 
 const app = exppress()
 
@@ -22,8 +23,9 @@ const apiLimiter = rateLimit({
         message: "Too many request, please try again later"
     }
 })
-app.use("/api", apiLimiter)
 
+app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(swaggerSpec))
+app.use("/api", apiLimiter)
 app.use("/api/auth", authRoutes)
 app.use("/api/events", eventRoutes)
 app.use("/api",ticketRoutes)
