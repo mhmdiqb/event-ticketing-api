@@ -227,6 +227,4 @@ Beberapa pengembangan yang dapat ditambahkan:
 
 ## Author
 
-**Muhammad Raga Rahman**
-
 GitHub: [@mhmdiqb](https://github.com/mhmdiqb)
